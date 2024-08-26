@@ -1,10 +1,18 @@
-// jobActions.js
 import { useSetRecoilState } from 'recoil';
 import { jobsState } from './atoms';
 import axios from 'axios';
 
 export const useJobActions = () => {
   const setJobsState = useSetRecoilState(jobsState);
+
+  const handleError = (error) => {
+    const message = error.response?.data?.message || 'An error occurred';
+    setJobsState((prev) => ({
+      ...prev,
+      loading: false,
+      error: message,
+    }));
+  };
 
   // Fetch all jobs
   const fetchJobs = async (city, niche, searchKeyword = "") => {
@@ -21,15 +29,11 @@ export const useJobActions = () => {
       setJobsState((prev) => ({
         ...prev,
         loading: false,
-        jobs: response.data.jobs,
+        jobs: response.data.jobs || [],
         error: null,
       }));
     } catch (error) {
-      setJobsState((prev) => ({
-        ...prev,
-        loading: false,
-        error: error.response.data.message,
-      }));
+      handleError(error);
     }
   };
 
@@ -44,15 +48,11 @@ export const useJobActions = () => {
       setJobsState((prev) => ({
         ...prev,
         loading: false,
-        singleJob: response.data.job,
+        singleJob: response.data.job || null,
         error: null,
       }));
     } catch (error) {
-      setJobsState((prev) => ({
-        ...prev,
-        loading: false,
-        error: error.response.data.message,
-      }));
+      handleError(error);
     }
   };
 
@@ -68,15 +68,11 @@ export const useJobActions = () => {
       setJobsState((prev) => ({
         ...prev,
         loading: false,
-        message: response.data.message,
+        message: response.data.message || 'Job posted successfully',
         error: null,
       }));
     } catch (error) {
-      setJobsState((prev) => ({
-        ...prev,
-        loading: false,
-        error: error.response.data.message,
-      }));
+      handleError(error);
     }
   };
 
@@ -91,15 +87,11 @@ export const useJobActions = () => {
       setJobsState((prev) => ({
         ...prev,
         loading: false,
-        myJobs: response.data.myJobs,
+        myJobs: response.data.myJobs || [],
         error: null,
       }));
     } catch (error) {
-      setJobsState((prev) => ({
-        ...prev,
-        loading: false,
-        error: error.response.data.message,
-      }));
+      handleError(error);
     }
   };
 
@@ -114,15 +106,11 @@ export const useJobActions = () => {
       setJobsState((prev) => ({
         ...prev,
         loading: false,
-        message: response.data.message,
+        message: response.data.message || 'Job deleted successfully',
         error: null,
       }));
     } catch (error) {
-      setJobsState((prev) => ({
-        ...prev,
-        loading: false,
-        error: error.response.data.message,
-      }));
+      handleError(error);
     }
   };
 
