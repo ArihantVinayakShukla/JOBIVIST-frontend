@@ -10,6 +10,7 @@ export const useUserActions = () => {
   const register = async (data) => {
     setUserState((prev) => ({ ...prev, loading: true }));
     try {
+      console.log("API URL:", import.meta.env.VITE_API_URL);
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/v1/user/register`,
         data,
