@@ -11,9 +11,16 @@ import PostApplication from "./pages/PostApplication";
 import Register from "./pages/Register";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useUserActions } from "./store/userActions";
+import { useEffect } from "react";
 
 const App = () => {
 
+  const { getUser } = useUserActions();
+
+  useEffect(() => {
+    getUser();
+  }, []); 
   return (
     <>
       <Router>

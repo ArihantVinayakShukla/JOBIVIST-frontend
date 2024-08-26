@@ -27,7 +27,7 @@ const Login = () => {
   });
 
   useEffect(() => {
-    if (error) {
+    if (error && !isAuthenticated) {
       toast.error(error);
       clearAllUserErrors();
     }

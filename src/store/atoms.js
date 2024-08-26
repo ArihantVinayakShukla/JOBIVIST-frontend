@@ -1,9 +1,12 @@
 // atoms.js
 import { atom } from 'recoil';
+import { recoilPersist } from 'recoil-persist';
+
+const { persistAtom } = recoilPersist();
 
 // Atom for user state
 export const userState = atom({
-  key: 'userState', // unique ID (with respect to other atoms/selectors)
+  key: 'userState',
   default: {
     loading: false,
     isAuthenticated: false,
@@ -11,6 +14,7 @@ export const userState = atom({
     error: null,
     message: null,
   },
+  effects_UNSTABLE: [persistAtom],
 });
 
 // Atom for jobs state

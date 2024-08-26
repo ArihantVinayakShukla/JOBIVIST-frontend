@@ -1,16 +1,29 @@
 // userActions.js
-import { useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState } from './atoms';
 import axios from 'axios';
 
 export const useUserActions = () => {
   const setUserState = useSetRecoilState(userState);
+  const currentUserState = useRecoilValue(userState);
+
+  const setUserToLocalStorage = (userData) => {
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
+  const removeUserFromLocalStorage = () => {
+    localStorage.removeItem('user');
+  };
+
+  const getUserFromLocalStorage = () => {
+    const userData = localStorage.getItem('user');
+    return userData ? JSON.parse(userData) : null;
+  };
 
   // Register a new user
   const register = async (data) => {
     setUserState((prev) => ({ ...prev, loading: true }));
     try {
-      console.log("API URL:", import.meta.env.VITE_API_URL);
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/v1/user/register`,
         data,
@@ -19,6 +32,11 @@ export const useUserActions = () => {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
+      const userData = {
+        isAuthenticated: true,
+        user: response.data.user,
+      };
+      setUserToLocalStorage(userData);
       setUserState({
         loading: false,
         isAuthenticated: true,
@@ -47,6 +65,11 @@ export const useUserActions = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
+      const userData = {
+        isAuthenticated: true,
+        user: response.data.user,
+      };
+      setUserToLocalStorage(userData);
       setUserState({
         loading: false,
         isAuthenticated: true,
@@ -65,6 +88,19 @@ export const useUserActions = () => {
 
   // Get user data
   const getUser = async () => {
+    const storedUser = getUserFromLocalStorage();
+    
+    if (storedUser && storedUser.isAuthenticated) {
+      setUserState({
+        loading: false,
+        isAuthenticated: true,
+        user: storedUser.user,
+        error: null,
+        message: null,
+      });
+      return;
+    }
+
     setUserState((prev) => ({ ...prev, loading: true }));
     try {
       const response = await axios.get(
@@ -73,18 +109,27 @@ export const useUserActions = () => {
           withCredentials: true,
         }
       );
-      setUserState((prev) => ({
-        ...prev,
+      const userData = {
+        isAuthenticated: true,
+        user: response.data.data,
+      };
+      setUserToLocalStorage(userData);
+      setUserState({
         loading: false,
         isAuthenticated: true,
-        user: response.data.user,
-      }));
+        user: response.data.data,
+        error: null,
+        message: null,
+      });
     } catch (error) {
-      setUserState((prev) => ({
-        ...prev,
+      removeUserFromLocalStorage();
+      setUserState({
         loading: false,
-        error: error.response.data.message,
-      }));
+        isAuthenticated: false,
+        user: {},
+        error: null,
+        message: null,
+      });
     }
   };
 
@@ -97,6 +142,7 @@ export const useUserActions = () => {
           withCredentials: true,
         }
       );
+      removeUserFromLocalStorage();
       setUserState({
         loading: false,
         isAuthenticated: false,
