@@ -133,32 +133,27 @@ export const useUserActions = () => {
     }
   };
 
-const logout = async () => {
-  try {
-    await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/v1/user/logout`,
-      {
-        withCredentials: true,
-      }
-    );
-    removeUserFromLocalStorage();
-    setUserState({
-      loading: false,
-      isAuthenticated: false,
-      user: {},
-      error: null,
-      message: null,
-    });
-    // Force a page reload to ensure all states are reset
-    window.location.href = '/';
-  } catch (error) {
-    console.error("Logout error:", error);
-    setUserState((prev) => ({
-      ...prev,
-      error: error.response?.data?.message || "Logout failed",
-    }));
-  }
-};
+  const logout = async () => {
+    try {
+      await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/v1/user/logout`,
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Always clear local state, even if the server request fails
+      removeUserFromLocalStorage();
+      setUserState({
+        loading: false,
+        isAuthenticated: false,
+        user: {},
+        error: null,
+        message: null,
+      });
+      window.location.href = '/';
+    }
+  };
 
   // Clear all errors
   const clearAllUserErrors = () => {
