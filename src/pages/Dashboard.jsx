@@ -23,8 +23,8 @@ const Dashboard = () => {
 
   const navigateTo = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     toast.success("Logged out successfully.");
   };
 

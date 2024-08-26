@@ -133,30 +133,32 @@ export const useUserActions = () => {
     }
   };
 
-  // Logout user
-  const logout = async () => {
-    try {
-      await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/v1/user/logout`,
-        {
-          withCredentials: true,
-        }
-      );
-      removeUserFromLocalStorage();
-      setUserState({
-        loading: false,
-        isAuthenticated: false,
-        user: {},
-        error: null,
-        message: null,
-      });
-    } catch (error) {
-      setUserState((prev) => ({
-        ...prev,
-        error: error.response.data.message,
-      }));
-    }
-  };
+const logout = async () => {
+  try {
+    await axios.get(
+      `${import.meta.env.VITE_API_URL}/api/v1/user/logout`,
+      {
+        withCredentials: true,
+      }
+    );
+    removeUserFromLocalStorage();
+    setUserState({
+      loading: false,
+      isAuthenticated: false,
+      user: {},
+      error: null,
+      message: null,
+    });
+    // Force a page reload to ensure all states are reset
+    window.location.href = '/';
+  } catch (error) {
+    console.error("Logout error:", error);
+    setUserState((prev) => ({
+      ...prev,
+      error: error.response?.data?.message || "Logout failed",
+    }));
+  }
+};
 
   // Clear all errors
   const clearAllUserErrors = () => {
